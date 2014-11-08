@@ -1,4 +1,4 @@
-package nlp.ai.main;
+package nlp.ai.util;
 
 import java.util.ArrayList;
 import java.util.List;
