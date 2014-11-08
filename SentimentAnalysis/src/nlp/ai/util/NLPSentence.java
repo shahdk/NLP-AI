@@ -14,22 +14,31 @@ import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
 
 public class NLPSentence {
-	
+
 	private String sentence;
 	private String sentenceSentiment;
 	private ArrayList<String> subjects;
-	private Map<String, ArrayList<String>> subjectMap = new HashMap<>();
-	private Map<String, ArrayList<String>> subjectSentiment = new HashMap<>();
-	private Map<String, String> subjectSentimentResult = new HashMap<>();
+	private Map<String, ArrayList<String>> subjectMap;
+	private Map<String, ArrayList<String>> subjectSentiment;
+	private Map<String, String> subjectSentimentResult;
 	private ArrayList<String> ngrams;
-	
-	public NLPSentence(String sentence){
+
+	public NLPSentence(String sentence) {
 		this.sentence = sentence;
-		this.sentenceSentiment="";
+		this.sentenceSentiment = "";
 		this.subjects = new ArrayList<>();
+		this.subjectMap = new HashMap<>();
+		this.subjectSentiment = new HashMap<>();
+		this.subjectSentimentResult = new HashMap<>();
+		this.ngrams = new ArrayList<String>();		
 		this.generateNGrams(sentence);
 	}
-	
+
+	public void calculateSentenceSentiment(CoreMap sentence) {
+		this.sentenceSentiment = sentence
+				.get(SentimentCoreAnnotations.ClassName.class);
+	}
+
 	public void generateNGrams(String sentence) {
 
 		// get rid of punctuation
@@ -41,19 +50,19 @@ public class NLPSentence {
 
 		for (int i = 0; i <= words.length - 4; i++) {
 			String threeGram = words[i] + " " + words[i + 1] + " "
-					+ words[i + 2] + " " + words[i+3];
+					+ words[i + 2] + " " + words[i + 3];
 			ngrams.add(threeGram);
 			if (words[i].contains("@"))
 				subjects.add(words[i]);
 		}
 	}
-	
+
 	public void extractSubjectsFromLine(CoreMap coreMapSentence) {
 		Tree tr = coreMapSentence.get(TreeCoreAnnotations.TreeAnnotation.class);
 		List<Tree> children = tr.firstChild().getChildrenAsList();
 		inOrderTraversal(children);
 	}
-	
+
 	public void inOrderTraversal(List<Tree> children) {
 		for (Tree sibling : children) {
 			if (sibling.label().value().toLowerCase().equals("np")) {
@@ -71,7 +80,7 @@ public class NLPSentence {
 		}
 		subjects.add(subject.trim());
 	}
-	
+
 	public void loadSubjectNgramMap() {
 		for (String subject : subjects) {
 			ArrayList<String> subjectNGrams = new ArrayList<>();
@@ -94,7 +103,7 @@ public class NLPSentence {
 			subjectMap.put(subject, subjectNGrams);
 		}
 	}
-	
+
 	public void loadSubjectSentimentsMap(StanfordCoreNLP pipeline) {
 		for (String subject : subjectMap.keySet()) {
 			ArrayList<String> sentiments = new ArrayList<>();
@@ -115,7 +124,7 @@ public class NLPSentence {
 			}
 		}
 	}
-	
+
 	public void calculateSentimentForSubject() {
 		for (String subject : subjectSentiment.keySet()) {
 			int positive = 0;
@@ -135,26 +144,39 @@ public class NLPSentence {
 				subjectSentimentResult.put(subject, "neutral");
 		}
 	}
-	
+
+	public void printResults() {
+		System.out.println("[ "+ this.sentenceSentiment + " ] " + this.sentence);
+		for (String subject : subjectSentimentResult.keySet()) {
+			System.out.println(subject + " : "
+					+ subjectSentimentResult.get(subject));
+		}
+	}
+
 	public String getSentence() {
 		return sentence;
 	}
+
 	public void setSentence(String sentence) {
 		this.sentence = sentence;
 	}
+
 	public String getSentenceSentiment() {
 		return sentenceSentiment;
 	}
+
 	public void setSentenceSentiment(String sentenceSentiment) {
 		this.sentenceSentiment = sentenceSentiment;
 	}
+
 	public ArrayList<String> getSubjects() {
 		return subjects;
 	}
+
 	public void setSubjects(ArrayList<String> subjects) {
 		this.subjects = subjects;
 	}
-	
+
 	public Map<String, String> getSubjectSentimentResult() {
 		return subjectSentimentResult;
 	}
@@ -168,7 +190,8 @@ public class NLPSentence {
 		return subjectSentiment;
 	}
 
-	public void setSubjectSentiment(Map<String, ArrayList<String>> subjectSentiment) {
+	public void setSubjectSentiment(
+			Map<String, ArrayList<String>> subjectSentiment) {
 		this.subjectSentiment = subjectSentiment;
 	}
 
@@ -187,6 +210,5 @@ public class NLPSentence {
 	public void setNgrams(ArrayList<String> ngrams) {
 		this.ngrams = ngrams;
 	}
-	
 
 }
