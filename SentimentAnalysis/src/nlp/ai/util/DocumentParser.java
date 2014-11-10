@@ -65,13 +65,10 @@ public class DocumentParser {
 
 				ArrayList<NLPSentence> nlpSentences = new ArrayList<>();
 				for (String line : sentenceList) {
-//					String line = "The movie was awful, but the actor was great. I also liked the story, but the action was awful.";
-//					line = "The actor was good, but the other actor was bad.";
 					nlpSentences.add(getNLPSentenceForLine(line));
 				}
 				this.nlpSentenceMap.put(file.getName().toLowerCase(),
 						nlpSentences);
-				break;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
