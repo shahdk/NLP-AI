@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.JComboBox;
@@ -42,14 +43,19 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 
 	public SentimentDisplay(String corpusDirectory, JProgressBar progressBar) {
 		super("NLP Results");
-		setSize(950, 600);
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		
 		this.sentimentColorMap = new HashMap<>();
 		this.loadSentimentColorMap();
 		this.corpusDir = corpusDirectory;
 
 		this.initComponents(progressBar);
 
+		this.initFrame();
+	}
+
+	private void initFrame() {
+		setSize(950, 600);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 		this.add(this.comboPanel, BorderLayout.NORTH);
 		this.add(this.resultPane, BorderLayout.CENTER);
@@ -69,36 +75,53 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 	}
 
 	public void initComponents(JProgressBar progressBar) {
-		this.comboLabel = new JLabel("Select Document: ");
+		initMenu();
+		initComboBox();
+		loadComboBoxData(progressBar);
+		initResultPanel();
+	}
+
+	private void initResultPanel() {
 		this.resultPanel = new JPanel();
 		this.resultPane = new JScrollPane(this.resultPanel);
+	}
+
+	private void loadComboBoxData(JProgressBar progressBar) {
+		DocumentParser docParser = new DocumentParser();
+		docParser.parseDoc(this.corpusDir, progressBar);
+		this.docNLPMap = docParser.getNlpSentenceMap();
+		
+		Iterator<String> itr = this.docNLPMap.keySet().iterator();
+		
+		while (itr.hasNext()) {
+			String docName = itr.next();
+			this.fileCombo.addItem(docName);
+		}
+	}
+
+	private void initComboBox() {
+		this.comboLabel = new JLabel("Select Document: ");
 		this.comboPanel = new JPanel();
 		this.fileCombo = new JComboBox<String>();
+		
+		this.fileCombo.addActionListener(this);
+		this.comboPanel.add(this.comboLabel);
+		this.comboPanel.add(this.fileCombo);
+	}
 
+	private void initMenu() {
 		this.menuBar = new JMenuBar();
 		this.fileMenu = new JMenu("File");
-
+		
 		this.newAnalysisItem = new JMenuItem("New Analysis");
 		this.newAnalysisItem.addActionListener(this);
+		
 		this.quitItem = new JMenuItem("Quit");
 		this.quitItem.addActionListener(this);
 
 		this.menuBar.add(this.fileMenu);
 		this.fileMenu.add(this.newAnalysisItem);
 		this.fileMenu.add(this.quitItem);
-
-		DocumentParser docParser = new DocumentParser();
-		docParser.parseDoc(this.corpusDir, progressBar);
-
-		this.docNLPMap = docParser.getNlpSentenceMap();
-
-		for (String docName : docNLPMap.keySet()) {
-			this.fileCombo.addItem(docName);
-		}
-		this.fileCombo.addActionListener(this);
-
-		this.comboPanel.add(this.comboLabel);
-		this.comboPanel.add(this.fileCombo);
 	}
 
 	@Override
@@ -122,47 +145,58 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 		for (NLPSentence nlpSentence : sentences) {
 
 			String resultSentence = nlpSentence.getSentence().toLowerCase();
-			Map<String, String> subjectMap = nlpSentence
-					.getSubjectSentimentResult();
 			String result = "<html>";
-			for (String subjectName : subjectMap.keySet()) {
-				String[] words = resultSentence.split(" ");
-				String sentence = "";
-				String sentiment = subjectMap.get(subjectName);
-				String coloredSubject = "";
-
-				coloredSubject += "<strong><font color='"
-						+ this.sentimentColorMap.get(sentiment.toLowerCase())
-						+ "'>" + subjectName + "</font></strong>";
-
-				int len = subjectName.split(" ").length;
-				int i = 0;
-				while (i < words.length) {
-					String word = "";
-					for (int j = 0; j < len; j++) {
-						if (i < words.length)
-							word += (words[i] + " ");
-						i++;
-					}
-					word = word.trim();
-					if (word.equals(subjectName.toLowerCase()))
-						sentence += (coloredSubject + " ");
-					else
-						sentence += (word + " ");
-				}
-				resultSentence = sentence.trim();
-			}
+			
+			resultSentence = getSubjectColor(nlpSentence, resultSentence);
+			
 			result += ("[ <font color='"
 					+ this.sentimentColorMap.get(nlpSentence
 							.getSentenceSentiment().toLowerCase()) + "'>"
 					+ nlpSentence.getSentenceSentiment() + "</font> ] --- "
 					+ resultSentence + "</html>");
+			
 			JLabel resultLabel = new JLabel(result);
 			Font font = new Font("Helvetica", Font.PLAIN, 18);
 			resultLabel.setFont(font);
+			
 			this.resultPanel.add(resultLabel);
 		}
+		
 		this.resultPane.revalidate();
 		this.resultPane.repaint();
+	}
+
+	private String getSubjectColor(NLPSentence nlpSentence,
+			String resultSentence) {
+		Map<String, String> subjectMap = nlpSentence
+				.getSubjectSentimentResult();
+		for (String subjectName : subjectMap.keySet()) {
+			String[] words = resultSentence.split(" ");
+			String sentence = "";
+			String sentiment = subjectMap.get(subjectName);
+			String coloredSubject = "";
+
+			coloredSubject += "<strong><font color='"
+					+ this.sentimentColorMap.get(sentiment.toLowerCase())
+					+ "'>" + subjectName + "</font></strong>";
+
+			int len = subjectName.split(" ").length;
+			int i = 0;
+			while (i < words.length) {
+				String word = "";
+				for (int j = 0; j < len; j++) {
+					if (i < words.length)
+						word += (words[i] + " ");
+					i++;
+				}
+				word = word.trim();
+				if (word.equals(subjectName.toLowerCase()))
+					sentence += (coloredSubject + " ");
+				else
+					sentence += (word + " ");
+			}
+			resultSentence = sentence.trim();
+		}
+		return resultSentence;
 	}
 }

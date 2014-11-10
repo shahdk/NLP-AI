@@ -2,8 +2,11 @@ package nlp.ai.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,7 +27,6 @@ import edu.stanford.nlp.util.CoreMap;
 
 public class DocumentParser {
 
-	// private ArrayList<NLPSentence> nlpSentences;
 	private Map<String, ArrayList<NLPSentence>> nlpSentenceMap;
 	private Properties props;
 	private StanfordCoreNLP pipeline;
@@ -44,45 +46,55 @@ public class DocumentParser {
 		try {
 			for (File file : files) {
 
-				FileInputStream fis = new FileInputStream(file);
-				byte[] data = new byte[(int) file.length()];
-				fis.read(data);
-				fis.close();
-
-				String content = new String(data, "UTF-8");
-
-				Reader reader = new StringReader(content);
-				DocumentPreprocessor dp = new DocumentPreprocessor(reader);
-				List<String> sentenceList = new LinkedList<String>();
-				Iterator<List<HasWord>> it = dp.iterator();
-				while (it.hasNext()) {
-					StringBuilder sentenceSb = new StringBuilder();
-					List<HasWord> sentence = it.next();
-					for (HasWord token : sentence) {
-						if (sentenceSb.length() >= 1) {
-							sentenceSb.append(" ");
-						}
-						sentenceSb.append(token);
-					}
-					sentenceList.add(sentenceSb.toString());
-				}
-
+				List<String> sentenceList = parseLines(file);
 				ArrayList<NLPSentence> nlpSentences = new ArrayList<>();
+				
 				for (String line : sentenceList) {
 					nlpSentences.add(getNLPSentenceForLine(line));
 				}
+				
 				this.nlpSentenceMap.put(file.getName().toLowerCase(),
 						nlpSentences);
+				
 				counter++;
-				int value = (int)(counter * 100 / totalFiles);
-				progressBar.setValue(value);
-				progressBar.setString(value+"%");
-				break;
+				updateProgressBar(progressBar, totalFiles, counter);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	private void updateProgressBar(JProgressBar progressBar, int totalFiles,
+			int counter) {
+		int value = (int)(counter * 100 / totalFiles);
+		progressBar.setValue(value);
+		progressBar.setString(value+"%");
+	}
+
+	private List<String> parseLines(File file) throws FileNotFoundException,
+			IOException, UnsupportedEncodingException {
+		FileInputStream fis = new FileInputStream(file);
+		byte[] data = new byte[(int) file.length()];
+		fis.read(data);
+		fis.close();
+		String content = new String(data, "UTF-8");
+		Reader reader = new StringReader(content);
+		DocumentPreprocessor dp = new DocumentPreprocessor(reader);
+		List<String> sentenceList = new LinkedList<String>();
+		Iterator<List<HasWord>> it = dp.iterator();
+		while (it.hasNext()) {
+			StringBuilder sentenceSb = new StringBuilder();
+			List<HasWord> sentence = it.next();
+			for (HasWord token : sentence) {
+				if (sentenceSb.length() >= 1) {
+					sentenceSb.append(" ");
+				}
+				sentenceSb.append(token);
+			}
+			sentenceList.add(sentenceSb.toString());
+		}
+		return sentenceList;
 	}
 
 	public NLPSentence getNLPSentenceForLine(String line) {
