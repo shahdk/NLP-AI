@@ -22,6 +22,7 @@ public class NLPSentence {
 	private Map<String, ArrayList<String>> subjectSentiment;
 	private Map<String, String> subjectSentimentResult;
 	private ArrayList<String> ngrams;
+	private Map<String, Integer> sentimentScoreMap;
 
 	public NLPSentence(String sentence) {
 		this.sentence = sentence;
@@ -30,8 +31,20 @@ public class NLPSentence {
 		this.subjectMap = new HashMap<>();
 		this.subjectSentiment = new HashMap<>();
 		this.subjectSentimentResult = new HashMap<>();
-		this.ngrams = new ArrayList<String>();		
+		this.ngrams = new ArrayList<String>();
+		this.sentimentScoreMap = new HashMap<>();
+		this.loadSentimentScoreMap();
 		this.generateNGrams(sentence);
+	}
+
+	public void loadSentimentScoreMap() {
+		String[] sentiments = new String[] { "very negative", "negative",
+				"neutral", "positive", "very positive" };
+		int[] scores = new int[]{-2, -1, 0, 1, 2};
+		
+		for (int i = 0; i<sentiments.length; i++){
+			this.sentimentScoreMap.put(sentiments[i], scores[i]);
+		}
 	}
 
 	public void calculateSentenceSentiment(CoreMap sentence) {
@@ -127,18 +140,15 @@ public class NLPSentence {
 
 	public void calculateSentimentForSubject() {
 		for (String subject : subjectSentiment.keySet()) {
-			int positive = 0;
-			int negative = 0;
+			int score = 0;
 			ArrayList<String> sentiments = subjectSentiment.get(subject);
 			for (String sentiment : sentiments) {
-				if (sentiment.toLowerCase().contains("positive"))
-					positive++;
-				else if (sentiment.toLowerCase().contains("negative"))
-					negative++;
+				sentiment = sentiment.toLowerCase();
+				score += this.sentimentScoreMap.get(sentiment);
 			}
-			if (positive > negative)
+			if (score > 0)
 				subjectSentimentResult.put(subject, "positive");
-			else if (negative > positive)
+			else if (score < 0)
 				subjectSentimentResult.put(subject, "negative");
 			else
 				subjectSentimentResult.put(subject, "neutral");
@@ -146,7 +156,8 @@ public class NLPSentence {
 	}
 
 	public void printResults() {
-		System.out.println("[ "+ this.sentenceSentiment + " ] " + this.sentence);
+		System.out.println("[ " + this.sentenceSentiment + " ] "
+				+ this.sentence);
 		for (String subject : subjectSentimentResult.keySet()) {
 			System.out.println(subject + " : "
 					+ subjectSentimentResult.get(subject));
