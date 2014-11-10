@@ -1,26 +1,32 @@
 package nlp.ai.main;
 
-import java.util.ArrayList;
-import java.util.Map;
+import javax.swing.UIManager;
 
-import nlp.ai.util.DocumentParser;
-import nlp.ai.util.NLPSentence;
+import nlp.ai.gui.FileChooser;
 
 public class Main {	
 	
 	public static void main(String[] args) {
 
-		DocumentParser docParser = new DocumentParser();
-		docParser.parseDoc("docs\\PositiveReviews");
+FileChooser sfc = new FileChooser();
 		
-		Map<String, ArrayList<NLPSentence>> docNLPMap = docParser.getNlpSentenceMap();
-		for (String docName: docNLPMap.keySet()){
-			ArrayList<NLPSentence> sentences = docNLPMap.get(docName);
-			for (NLPSentence sentence: sentences){
-				sentence.printResults();
-				break;
-			}
-			break;
-		}	 
+		try {
+			// UIManager.setLookAndFeel("com.seaglasslookandfeel.SeaGlassLookAndFeel");
+			// for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
+			// {
+			// if ("Nimbus".equals(info.getName())) {
+			// UIManager.setLookAndFeel(info.getClassName());
+			// break;
+			// }
+			// }
+			UIManager.setLookAndFeel("com.birosoft.liquid.LiquidLookAndFeel");
+
+		} catch (Exception e) {
+			// If Nimbus is not available, you can set the GUI to another look
+			// and feel.
+			e.printStackTrace();
+		}
+		
+		sfc.setVisible(true);	 
 	}
 }
