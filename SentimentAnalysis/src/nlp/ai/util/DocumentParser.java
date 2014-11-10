@@ -77,6 +77,7 @@ public class DocumentParser {
 				int value = (int)(counter * 100 / totalFiles);
 				progressBar.setValue(value);
 				progressBar.setString(value+"%");
+				break;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

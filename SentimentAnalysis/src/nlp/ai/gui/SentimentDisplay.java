@@ -12,6 +12,9 @@ import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -25,7 +28,10 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	private String corpusDir;
-
+	private JMenuBar menuBar;
+	private JMenu fileMenu;
+	private JMenuItem newAnalysisItem;
+	private JMenuItem quitItem;
 	private JLabel comboLabel;
 	private JComboBox<String> fileCombo;
 	private Map<String, String> sentimentColorMap;
@@ -41,16 +47,21 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 		this.sentimentColorMap = new HashMap<>();
 		this.loadSentimentColorMap();
 		this.corpusDir = corpusDirectory;
+
 		this.initComponents(progressBar);
+
 		this.setLayout(new BorderLayout());
 		this.add(this.comboPanel, BorderLayout.NORTH);
 		this.add(this.resultPane, BorderLayout.CENTER);
+		this.setJMenuBar(this.menuBar);
 		setLocationRelativeTo(null);
 	}
 
 	public void loadSentimentColorMap() {
-		String[] sentiments = new String[] { "very positive", "positive", "very negative", "negative", "neutral" };
-		String[] sentimentColors = new String[] { "green", "green", "red", "red", "black" };
+		String[] sentiments = new String[] { "very positive", "positive",
+				"very negative", "negative", "neutral" };
+		String[] sentimentColors = new String[] { "green", "green", "red",
+				"red", "black" };
 
 		for (int i = 0; i < sentiments.length; i++) {
 			this.sentimentColorMap.put(sentiments[i], sentimentColors[i]);
@@ -63,6 +74,18 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 		this.resultPane = new JScrollPane(this.resultPanel);
 		this.comboPanel = new JPanel();
 		this.fileCombo = new JComboBox<String>();
+
+		this.menuBar = new JMenuBar();
+		this.fileMenu = new JMenu("File");
+
+		this.newAnalysisItem = new JMenuItem("New Analysis");
+		this.newAnalysisItem.addActionListener(this);
+		this.quitItem = new JMenuItem("Quit");
+		this.quitItem.addActionListener(this);
+
+		this.menuBar.add(this.fileMenu);
+		this.fileMenu.add(this.newAnalysisItem);
+		this.fileMenu.add(this.quitItem);
 
 		DocumentParser docParser = new DocumentParser();
 		docParser.parseDoc(this.corpusDir, progressBar);
@@ -80,6 +103,17 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if (e.getSource().equals(this.newAnalysisItem)) {
+			FileChooser sfc = new FileChooser();
+			sfc.setVisible(true);
+		} else if (e.getSource().equals(this.quitItem)) {
+			System.exit(0);
+		} else {
+			displayResults();
+		}
+	}
+
+	private void displayResults() {
 		ArrayList<NLPSentence> sentences = docNLPMap
 				.get((String) this.fileCombo.getSelectedItem());
 
@@ -124,8 +158,7 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 					+ nlpSentence.getSentenceSentiment() + "</font> ] --- "
 					+ resultSentence + "</html>");
 			JLabel resultLabel = new JLabel(result);
-			Font font = new Font ("Helvetica", Font.PLAIN , 18);
-//			resultLabel.setSize(950, 25);
+			Font font = new Font("Helvetica", Font.PLAIN, 18);
 			resultLabel.setFont(font);
 			this.resultPanel.add(resultLabel);
 		}
