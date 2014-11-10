@@ -46,7 +46,7 @@ public class FileChooser extends JFrame implements ActionListener {
 		this.inputPanel = new JPanel();
 		this.inputPanel.setLayout(new BorderLayout());
 
-		this.inputTextField = new JTextField("");
+		this.inputTextField = new JTextField("docs\\PositiveReviews");
 		this.inputTextField.setSize(20, 130);
 
 		this.inputButton = new JButton("Browse..");

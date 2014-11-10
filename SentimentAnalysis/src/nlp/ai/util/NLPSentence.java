@@ -61,12 +61,10 @@ public class NLPSentence {
 		sentence = sentence.replaceAll(";", " ");
 		String[] words = sentence.split(" ");
 
-		for (int i = 0; i <= words.length - 4; i++) {
+		for (int i = 0; i <= words.length - 5; i++) {
 			String threeGram = words[i] + " " + words[i + 1] + " "
-					+ words[i + 2] + " " + words[i + 3];
+					+ words[i + 2] + " " + words[i + 3] + " " + words[i + 4];
 			ngrams.add(threeGram);
-			if (words[i].contains("@"))
-				subjects.add(words[i]);
 		}
 	}
 
