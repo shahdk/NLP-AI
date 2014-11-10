@@ -1,16 +1,20 @@
 package nlp.ai.gui;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import nlp.ai.util.OSDetector;
 
 public class FileChooser extends JFrame implements ActionListener {
 
@@ -30,28 +34,33 @@ public class FileChooser extends JFrame implements ActionListener {
 
 	public FileChooser() {
 		super("Corpus Selector");
-		setSize(450, 200);
+		setSize(450, 250);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		this.initComponents();
-		this.setLayout(new GridLayout(3, 1));
-		this.add(this.inputFileLabel, 0);
-		this.add(this.inputPanel, 1);
-		this.add(this.runButton, 2);
+		this.setLayout(new BorderLayout());
+		this.add(this.inputFileLabel, BorderLayout.NORTH);
+		this.add(this.inputPanel, BorderLayout.CENTER);
+		this.add(this.runButton, BorderLayout.SOUTH);
 	}
 
 	public void initComponents() {
 		this.inputFileLabel = new JLabel("Select Corpus Folder:");
-
+		this.inputFileLabel.setPreferredSize(new Dimension(450, 30));
 		this.inputPanel = new JPanel();
 		this.inputPanel.setLayout(new BorderLayout());
-
-		this.inputTextField = new JTextField("docs\\PositiveReviews");
-		this.inputTextField.setSize(20, 130);
+		this.inputPanel.setPreferredSize(new Dimension(450, 30));
+		if (OSDetector.isWindows())
+			this.inputTextField = new JTextField("docs\\PositiveReviews");
+		else
+			this.inputTextField = new JTextField("docs/PositiveReviews");
+		this.inputTextField.setPreferredSize(new Dimension(350, 30));
 
 		this.inputButton = new JButton("Browse..");
-		this.runButton = new JButton("Hit it!");
-		this.inputButton.setSize(20, 50);
+		this.runButton = new JButton("Hit It!");
+		this.inputButton.setPreferredSize(new Dimension(100, 30));
+		this.runButton.setPreferredSize(new Dimension(450, 140));
+		
 		this.inputButton.addActionListener(this);
 		this.runButton.addActionListener(this);
 
@@ -61,12 +70,25 @@ public class FileChooser extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource().equals(this.runButton)){
-			
-			SentimentDisplay results = new SentimentDisplay(this.inputTextField.getText());
-			results.setVisible(true);
-		}
-		else{
+		if (e.getSource().equals(this.runButton)) {
+			this.runButton.setText("");
+			if (OSDetector.isWindows())
+				this.runButton.setIcon(new ImageIcon("assets\\loading.gif"));
+			else
+				this.runButton.setIcon(new ImageIcon("assets/loading.gif"));
+
+			Thread t = new Thread() {
+				public void run() {
+					synchronized (this) {
+						SentimentDisplay results = new SentimentDisplay(
+								inputTextField.getText());
+						results.setVisible(true);
+						dispose();
+					}
+				}
+			};
+			t.start();
+		} else {
 			JFileChooser chooser = new JFileChooser();
 			File workingDirectory = new File(System.getProperty("user.dir"));
 			chooser.setCurrentDirectory(workingDirectory);
@@ -80,7 +102,6 @@ public class FileChooser extends JFrame implements ActionListener {
 				this.inputTextField.setText("");
 			}
 		}
-		
-	}
 
+	}
 }

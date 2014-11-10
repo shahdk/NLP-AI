@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 
 import nlp.ai.util.DocumentParser;
 import nlp.ai.util.NLPSentence;
@@ -35,6 +36,7 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 	public SentimentDisplay(String corpusDirectory) {
 		super("NLP Results");
 		setSize(950, 600);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.sentimentColorMap = new HashMap<>();
 		this.loadSentimentColorMap();
 		this.corpusDir = corpusDirectory;
