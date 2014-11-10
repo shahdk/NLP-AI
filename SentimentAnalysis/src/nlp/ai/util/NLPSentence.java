@@ -61,11 +61,9 @@ public class NLPSentence {
 		sentence = sentence.replaceAll(";", " ");
 		String[] words = sentence.split(" ");
 
-		for (int i = 0; i <= words.length - 5; i++) {
-			String threeGram = words[i] + " " + words[i + 1] + " "
-					+ words[i + 2] + " " + words[i + 3] + " " + words[i + 4];
-			ngrams.add(threeGram);
-		}
+		SkipGramGenerator ngramGenerator = new SkipGramGenerator(words);
+		this.ngrams = ngramGenerator.generate();
+		
 	}
 
 	public void extractSubjectsFromLine(CoreMap coreMapSentence) {
@@ -79,7 +77,6 @@ public class NLPSentence {
 			if (sibling.label().value().toLowerCase().equals("np")) {
 				getSubject(sibling.getChildrenAsList());
 			} else {
-				System.out.println(sibling.labels().toString());
 				inOrderTraversal(sibling.getChildrenAsList());
 			}
 		}
