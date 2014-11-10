@@ -89,19 +89,23 @@ public class FileChooser extends JFrame implements ActionListener {
 			};
 			t.start();
 		} else {
-			JFileChooser chooser = new JFileChooser();
-			File workingDirectory = new File(System.getProperty("user.dir"));
-			chooser.setCurrentDirectory(workingDirectory);
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			int option = chooser.showOpenDialog(FileChooser.this);
-			if (option == JFileChooser.APPROVE_OPTION) {
-				this.inputTextField
-						.setText((chooser.getSelectedFile() != null) ? chooser
-								.getSelectedFile().getPath() : "nothing");
-			} else {
-				this.inputTextField.setText("");
-			}
+			chooseFile();
 		}
 
+	}
+
+	private void chooseFile() {
+		JFileChooser chooser = new JFileChooser();
+		File workingDirectory = new File(System.getProperty("user.dir"));
+		chooser.setCurrentDirectory(workingDirectory);
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int option = chooser.showOpenDialog(FileChooser.this);
+		if (option == JFileChooser.APPROVE_OPTION) {
+			this.inputTextField
+					.setText((chooser.getSelectedFile() != null) ? chooser
+							.getSelectedFile().getPath() : "nothing");
+		} else {
+			this.inputTextField.setText("");
+		}
 	}
 }

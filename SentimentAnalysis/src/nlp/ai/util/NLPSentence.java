@@ -79,6 +79,7 @@ public class NLPSentence {
 			if (sibling.label().value().toLowerCase().equals("np")) {
 				getSubject(sibling.getChildrenAsList());
 			} else {
+				System.out.println(sibling.labels().toString());
 				inOrderTraversal(sibling.getChildrenAsList());
 			}
 		}
