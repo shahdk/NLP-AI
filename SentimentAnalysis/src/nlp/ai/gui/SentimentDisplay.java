@@ -13,6 +13,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
@@ -33,14 +34,14 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 	private JPanel resultPanel;
 	private Map<String, ArrayList<NLPSentence>> docNLPMap;
 
-	public SentimentDisplay(String corpusDirectory) {
+	public SentimentDisplay(String corpusDirectory, JProgressBar progressBar) {
 		super("NLP Results");
 		setSize(950, 600);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.sentimentColorMap = new HashMap<>();
 		this.loadSentimentColorMap();
 		this.corpusDir = corpusDirectory;
-		this.initComponents();
+		this.initComponents(progressBar);
 		this.setLayout(new BorderLayout());
 		this.add(this.comboPanel, BorderLayout.NORTH);
 		this.add(this.resultPane, BorderLayout.CENTER);
@@ -56,7 +57,7 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 		}
 	}
 
-	public void initComponents() {
+	public void initComponents(JProgressBar progressBar) {
 		this.comboLabel = new JLabel("Select Document: ");
 		this.resultPanel = new JPanel();
 		this.resultPane = new JScrollPane(this.resultPanel);
@@ -64,7 +65,7 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 		this.fileCombo = new JComboBox<String>();
 
 		DocumentParser docParser = new DocumentParser();
-		docParser.parseDoc(this.corpusDir);
+		docParser.parseDoc(this.corpusDir, progressBar);
 
 		this.docNLPMap = docParser.getNlpSentenceMap();
 

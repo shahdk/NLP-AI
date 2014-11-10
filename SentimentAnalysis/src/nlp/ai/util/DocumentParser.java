@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.swing.JProgressBar;
+
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.HasWord;
@@ -35,8 +37,10 @@ public class DocumentParser {
 		this.pipeline = new StanfordCoreNLP(props);
 	}
 
-	public void parseDoc(String folderPath) {
+	public void parseDoc(String folderPath, JProgressBar progressBar) {
 		File[] files = new File(folderPath).listFiles();
+		int totalFiles = files.length;
+		int counter = 0;
 		try {
 			for (File file : files) {
 
@@ -69,6 +73,10 @@ public class DocumentParser {
 				}
 				this.nlpSentenceMap.put(file.getName().toLowerCase(),
 						nlpSentences);
+				counter++;
+				int value = (int)(counter * 100 / totalFiles);
+				progressBar.setValue(value);
+				progressBar.setString(value+"%");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
