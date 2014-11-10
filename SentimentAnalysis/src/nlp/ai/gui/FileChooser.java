@@ -37,7 +37,7 @@ public class FileChooser extends JFrame implements ActionListener {
 		super("Corpus Selector");
 		setSize(450, 180);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-
+		setLocationRelativeTo(null);
 		this.initComponents();
 		this.setLayout(new BorderLayout());
 		this.add(this.inputFileLabel, BorderLayout.NORTH);
