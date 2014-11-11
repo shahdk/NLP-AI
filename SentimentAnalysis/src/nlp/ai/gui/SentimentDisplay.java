@@ -23,6 +23,7 @@ import javax.swing.WindowConstants;
 
 import nlp.ai.util.DocumentParser;
 import nlp.ai.util.NLPSentence;
+import nlp.ai.util.SortedComboBoxModel;
 
 public class SentimentDisplay extends JFrame implements ActionListener {
 
@@ -77,8 +78,8 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 	public void initComponents(JProgressBar progressBar) {
 		initMenu();
 		initComboBox();
-		loadComboBoxData(progressBar);
 		initResultPanel();
+		loadComboBoxData(progressBar);
 	}
 
 	private void initResultPanel() {
@@ -102,7 +103,7 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 	private void initComboBox() {
 		this.comboLabel = new JLabel("Select Document: ");
 		this.comboPanel = new JPanel();
-		this.fileCombo = new JComboBox<String>();
+		this.fileCombo = new JComboBox<String>(new SortedComboBoxModel<String>());
 		
 		this.fileCombo.addActionListener(this);
 		this.comboPanel.add(this.comboLabel);
@@ -137,11 +138,11 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 	}
 
 	private void displayResults() {
-		ArrayList<NLPSentence> sentences = docNLPMap
+		ArrayList<NLPSentence> sentences = this.docNLPMap
 				.get((String) this.fileCombo.getSelectedItem());
-
+		this.resultPanel.removeAll();
 		this.resultPanel.setLayout(new GridLayout(sentences.size(), 1));
-
+		
 		for (NLPSentence nlpSentence : sentences) {
 
 			String resultSentence = nlpSentence.getSentence().toLowerCase();
@@ -168,8 +169,10 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 
 	private String getSubjectColor(NLPSentence nlpSentence,
 			String resultSentence) {
+		
 		Map<String, String> subjectMap = nlpSentence
 				.getSubjectSentimentResult();
+		
 		for (String subjectName : subjectMap.keySet()) {
 			String[] words = resultSentence.split(" ");
 			String sentence = "";

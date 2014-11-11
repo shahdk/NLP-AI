@@ -48,9 +48,9 @@ public class FileChooser extends JFrame implements ActionListener {
 
 	public void initComponents() {
 		initProgressBar();
-		
+
 		initInputLabel();
-		
+
 		initInputTextField();
 
 		initInputButton();
@@ -58,7 +58,7 @@ public class FileChooser extends JFrame implements ActionListener {
 		initRunButton();
 
 		initInputPanel();
-		
+
 		initRunPanel();
 	}
 
@@ -84,7 +84,7 @@ public class FileChooser extends JFrame implements ActionListener {
 
 	private void initRunPanel() {
 		this.runPanel = new JPanel();
-		this.runPanel.setLayout(new GridLayout(2,1));
+		this.runPanel.setLayout(new GridLayout(2, 1));
 		this.runPanel.setPreferredSize(new Dimension(450, 75));
 		this.runPanel.add(this.runButton);
 		this.runPanel.add(this.progressBar);
@@ -125,12 +125,12 @@ public class FileChooser extends JFrame implements ActionListener {
 	private void displaySentimentResult() {
 		Thread t = new Thread() {
 			public void run() {
-				synchronized (this) {
-					SentimentDisplay results = new SentimentDisplay(
-							inputTextField.getText(), progressBar);
-					results.setVisible(true);
-					dispose();
-				}
+
+				SentimentDisplay results = new SentimentDisplay(
+						inputTextField.getText(), progressBar);
+				results.setVisible(true);
+				dispose();
+
 			}
 		};
 		t.start();
