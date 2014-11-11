@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -13,7 +14,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-
 import nlp.ai.util.OSDetector;
 
 public class FileChooser extends JFrame implements ActionListener {
@@ -107,14 +107,13 @@ public class FileChooser extends JFrame implements ActionListener {
 		this.progressBar = new JProgressBar();
 		this.progressBar.setMinimum(0);
 		this.progressBar.setMaximum(100);
-		this.progressBar.setStringPainted(true);
-		this.progressBar.setString("0%");
-		this.progressBar.setPreferredSize(new Dimension(400, 30));
+		this.progressBar.setPreferredSize(new Dimension(450, 30));
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(this.runButton)) {
+			this.progressBar.setIndeterminate(true);
 			displaySentimentResult();
 		} else {
 			chooseFile();

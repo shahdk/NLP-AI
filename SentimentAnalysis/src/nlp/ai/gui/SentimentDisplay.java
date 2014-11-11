@@ -41,6 +41,7 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 	private JScrollPane resultPane;
 	private JPanel resultPanel;
 	private Map<String, ArrayList<NLPSentence>> docNLPMap;
+	private JLabel docSentimentLabel;
 
 	public SentimentDisplay(String corpusDirectory, JProgressBar progressBar) {
 		super("NLP Results");
@@ -104,10 +105,12 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 		this.comboLabel = new JLabel("Select Document: ");
 		this.comboPanel = new JPanel();
 		this.fileCombo = new JComboBox<String>(new SortedComboBoxModel<String>());
+		this.docSentimentLabel = new JLabel();
 		
 		this.fileCombo.addActionListener(this);
 		this.comboPanel.add(this.comboLabel);
 		this.comboPanel.add(this.fileCombo);
+		this.comboPanel.add(this.docSentimentLabel);
 	}
 
 	private void initMenu() {
@@ -142,18 +145,19 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 				.get((String) this.fileCombo.getSelectedItem());
 		this.resultPanel.removeAll();
 		this.resultPanel.setLayout(new GridLayout(sentences.size(), 1));
-		
+		int sentimentScore = 0;
 		for (NLPSentence nlpSentence : sentences) {
-
+			String sentenceSentiment = nlpSentence.getSentenceSentiment();
+			sentimentScore += nlpSentence.getSentimentScore(sentenceSentiment);
+			
 			String resultSentence = nlpSentence.getSentence().toLowerCase();
 			String result = "<html>";
 			
 			resultSentence = getSubjectColor(nlpSentence, resultSentence);
 			
 			result += ("[ <font color='"
-					+ this.sentimentColorMap.get(nlpSentence
-							.getSentenceSentiment().toLowerCase()) + "'>"
-					+ nlpSentence.getSentenceSentiment() + "</font> ] --- "
+					+ this.sentimentColorMap.get(sentenceSentiment.toLowerCase()) + "'>"
+					+ sentenceSentiment + "</font> ] --- "
 					+ resultSentence + "</html>");
 			
 			JLabel resultLabel = new JLabel(result);
@@ -165,6 +169,16 @@ public class SentimentDisplay extends JFrame implements ActionListener {
 		
 		this.resultPane.revalidate();
 		this.resultPane.repaint();
+		
+		if (sentimentScore > 0)
+			this.docSentimentLabel.setText("Positive");
+		else if (sentimentScore < 0)
+			this.docSentimentLabel.setText("Negative");
+		else
+			this.docSentimentLabel.setText("Neutral");
+		
+		this.comboPanel.revalidate();
+		this.comboPanel.repaint();
 	}
 
 	private String getSubjectColor(NLPSentence nlpSentence,

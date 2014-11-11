@@ -45,7 +45,7 @@ public class DocumentParser {
 		int counter = 0;
 		try {
 			for (File file : files) {
-
+				
 				List<String> sentenceList = parseLines(file);
 				ArrayList<NLPSentence> nlpSentences = new ArrayList<>();
 				
@@ -68,8 +68,11 @@ public class DocumentParser {
 	private void updateProgressBar(JProgressBar progressBar, int totalFiles,
 			int counter) {
 		int value = (int)(counter * 100 / totalFiles);
+		progressBar.setStringPainted(true);
+		progressBar.setIndeterminate(false);
 		progressBar.setValue(value);
 		progressBar.setString(value+"%");
+		
 	}
 
 	private List<String> parseLines(File file) throws FileNotFoundException,

@@ -217,5 +217,9 @@ public class NLPSentence {
 	public void setNgrams(ArrayList<String> ngrams) {
 		this.ngrams = ngrams;
 	}
+	
+	public int getSentimentScore(String sentiment){
+		return this.sentimentScoreMap.get(sentiment.toLowerCase());
+	}
 
 }
